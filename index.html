@@ -1,1 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gouvernement de Lorval - Accueil</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; }
 
+    header {
+        background: #004080;
+        color: white;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        position: sticky; top: 0; z-index: 100;
+    }
+    header h1 { font-size: 2rem; }
+    .search-bar { display: flex; align-items: center; gap: 10px; }
+    .search-bar input {
+        padding: 10px; border-radius: 8px; border: none; font-size: 1rem; transition: all 0.3s;
+    }
+    .search-bar input:focus { outline: none; box-shadow: 0 0 10px #ff9800; }
+    .search-bar button {
+        padding: 10px 20px; border: none; border-radius: 8px;
+        background-color: #ff9800; color: white; font-weight: bold;
+        cursor: pointer; transition: transform 0.2s, background 0.3s;
+    }
+    .search-bar button:hover { transform: scale(1.1); background-color: #e68900; }
+
+    main {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px; padding: 30px;
+    }
+
+    .section {
+        background: white; border-radius: 20px; padding: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        cursor: pointer;
+    }
+    .section:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 16px 30px rgba(0,0,0,0.2); background: #f7f9fc; }
+    .section img { width: 20%; max-width: 100px; margin-bottom: 15px; transition: transform 0.3s ease; }
+    .section:hover img { transform: scale(1.2) rotate(-5deg); }
+    .section h2 { margin-bottom: 15px; font-size: 1.5rem; color: #004080; transition: color 0.3s; }
+    .buttons a { display: block; margin: 8px 0; text-decoration: none; }
+    .buttons button {
+        width: 100%; padding: 12px; border: none; border-radius: 12px;
+        background-color: #007bff; color: white; cursor: pointer;
+        font-size: 1rem; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .buttons button:hover { background-color: #0056b3; transform: translateY(-5px) scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+    @media (max-width: 768px) {
+        header h1 { font-size: 1.5rem; }
+        .section h2 { font-size: 1.3rem; }
+        .buttons button { font-size: 0.9rem; padding: 10px; }
+        .section img { width: 25%; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Gouvernement de Lorval</h1>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Rechercher un service...">
+        <button>Rechercher</button>
+        <a href="/login"><button>myGov</button></a>
+    </div>
+</header>
+
+<main>
+    <!-- SECTION ARMES -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/gun.png" alt="Armes">
+        <h2>Armes</h2>
+        <div class="buttons">
+            <a href="/arme/avoir-permis"><button>Avoir un permis de port d'arme</button></a>
+            <a href="/arme/declarer"><button>Déclarer une arme</button></a>
+            <a href="/arme/signaler"><button>Signaler une arme</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION PLAINTES -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/complaint.png" alt="Plaintes">
+        <h2>Plaintes</h2>
+        <div class="buttons">
+            <a href="/plaintes/civil"><button>Porter plainte contre un civil</button></a>
+            <a href="/plaintes/police"><button>Porter plainte contre une autorité policière</button></a>
+            <a href="/plaintes/lois"><button>Porter plainte contre des lois</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION MAISONS -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/house.png" alt="Maisons">
+        <h2>Maisons</h2>
+        <div class="buttons">
+            <a href="/maisons/acheter"><button>Acheter une maison</button></a>
+            <a href="/maisons/vendre"><button>Vendre une maison</button></a>
+            <a href="/maisons/declarer"><button>Déclarer une maison</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION ANIMAUX -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/paw-print.png" alt="Animaux">
+        <h2>Animaux</h2>
+        <div class="buttons">
+            <a href="/animaux/acheter"><button>Acheter un animal</button></a>
+            <a href="/animaux/vendre"><button>Vendre un animal</button></a>
+            <a href="/animaux/declarer"><button>Déclarer un animal</button></a>
+            <a href="/animaux/euthanasier"><button>Euthanasier un animal</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION IDENTITÉ -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/id-card.png" alt="Identité">
+        <h2>Identité</h2>
+        <div class="buttons">
+            <a href="/identite/nationalite"><button>Obtenir la nationalité Lorvaloise</button></a>
+            <a href="/identite/renouveler"><button>Renouveler mon identité</button></a>
+            <a href="/identite/signaler"><button>Signaler identité perdue/volée</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION ORASTRES -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/government.png" alt="Orastres">
+        <h2>Orastres</h2>
+        <div class="buttons">
+            <a href="/orastres/finances"><button>Orastre des Finances</button></a>
+            <a href="/orastres/sante"><button>Orastre de la Santé</button></a>
+            <a href="/orastres/education"><button>Orastre de l'Éducation</button></a>
+            <a href="/orastres/interieur"><button>Orastre de l'Intérieur</button></a>
+            <a href="/orastres/affaires-etrangeres"><button>Orastre des affaires étrangères</button></a>
+            <a href="/orastres/environnement"><button>Orastre de l'environnement</button></a>
+            <a href="/orastres/securite"><button>Orastre de la Sécurité</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION ÉDUCATION -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/school.png" alt="Éducation">
+        <h2>Éducation</h2>
+        <div class="buttons">
+            <a href="/education/postuler"><button>Postuler à une école</button></a>
+            <a href="/education/declarer"><button>Déclarer une école</button></a>
+            <a href="/education/perdu-brevet"><button>J'ai perdu mon brevet</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION AFFAIRES ÉTRANGÈRES -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/earth-globe.png" alt="Affaires étrangères">
+        <h2>Affaires étrangères</h2>
+        <div class="buttons">
+            <a href="/affaires/immigrer"><button>Immigrer à Lorval</button></a>
+            <a href="/affaires/visa-temp"><button>Obtenir un VISA temporaire</button></a>
+            <a href="/affaires/visa-vivre"><button>VISA pour vivre à Lorval</button></a>
+            <a href="/affaires/visa-prolonge"><button>VISA prolongé</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION SANTÉ -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/hospital.png" alt="Santé">
+        <h2>Santé</h2>
+        <div class="buttons">
+            <a href="/sante/rendez-vous"><button>Prendre rendez-vous à l'hôpital</button></a>
+            <a href="/sante/maladie"><button>Déclarer une maladie dangereuse</button></a>
+            <a href="/sante/vaccin"><button>Obtenir un vaccin</button></a>
+            <a href="/sante/assistance"><button>Demander assistance médicale</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION TRANSPORT -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/car.png" alt="Transport">
+        <h2>Transport</h2>
+        <div class="buttons">
+            <a href="/transport/acheter"><button>Acheter une voiture</button></a>
+            <a href="/transport/vendre"><button>Vendre une voiture</button></a>
+            <a href="/transport/permis"><button>Avoir un permis de conduire</button></a>
+            <a href="/transport/permis-renouveler"><button>Renouveler permis</button></a>
+            <a href="/transport/vehicule-disparu"><button>Déclarer véhicule perdu/volé</button></a>
+            <a href="/transport/contraventions"><button>Payer contraventions</button></a>
+            <a href="/transport/plaque"><button>Avoir une plaque d'immatriculation</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION TRAVAIL -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/work.png" alt="Travail">
+        <h2>Travail</h2>
+        <div class="buttons">
+            <a href="/travail/postuler"><button>Postuler à un emploi</button></a>
+            <a href="/travail/declarer"><button>Déclarer un emploi</button></a>
+            <a href="/travail/chomage"><button>Obtenir aide au chômage</button></a>
+            <a href="/travail/casier"><button>Vérifier casier judiciaire</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION JUSTICE -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/justice.png" alt="Justice">
+        <h2>Justice</h2>
+        <div class="buttons">
+            <a href="/justice/contester"><button>Contester une amende/décision</button></a>
+            <a href="/justice/documents"><button>Accéder aux documents légaux</button></a>
+            <a href="/justice/avocat"><button>Demander avocat commis d'office</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION SERVICE PUBLIC -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/service.png" alt="Service public">
+        <h2>Service public</h2>
+        <div class="buttons">
+            <a href="/service/eau"><button>Accès à l'eau potable</button></a>
+            <a href="/service/electricite"><button>Accès à l'électricité</button></a>
+            <a href="/service/probleme"><button>Déclarer un problème dans la ville</button></a>
+            <a href="/service/subvention"><button>Demander une subvention</button></a>
+            <a href="/service/remboursement"><button>Demander un remboursement</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION LOISIR -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/festival.png" alt="Loisir">
+        <h2>Loisir</h2>
+        <div class="buttons">
+            <a href="/loisir/evenement"><button>Inscrire un événement</button></a>
+            <a href="/loisir/permis"><button>Demander permis festival/marché</button></a>
+            <a href="/loisir/bibliotheque"><button>Bibliothèque et ressources publiques</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION TAXES -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/tax.png" alt="Taxes">
+        <h2>Taxes</h2>
+        <div class="buttons">
+            <a href="/taxes/impots"><button>Payer des impôts</button></a>
+            <a href="/taxes/entreprises"><button>Payer taxes d'entreprises</button></a>
+            <a href="/taxes/taux"><button>Taux de taxes actuel</button></a>
+        </div>
+    </div>
+
+    <!-- SECTION ÉLECTION -->
+    <div class="section">
+        <img src="https://img.icons8.com/fluency/96/vote.png" alt="Élection">
+        <h2>Élection</h2>
+        <div class="buttons">
+            <a href="/election/participez"><button>Participer aux élections</button></a>
+            <a href="/election/resultats"><button>Voir résultats</button></a>
+            <a href="/election/candidature"><button>Déposer candidature</button></a>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>
