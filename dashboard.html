@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — Gouvernement de Lorval</title>
+  <style>
+    :root{ --navy:#0b2b4a; --muted:#5f6b75; font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;}
+    body{ margin:0; background:#fff; color:var(--navy); -webkit-font-smoothing:antialiased;}
+    header{ display:flex; align-items:center; justify-content:space-between; padding:20px 28px; box-shadow: 0 8px 20px rgba(11,43,74,0.04);}
+    .brand{ font-weight:700; font-size:18px;}
+    main{ padding:28px; max-width:980px; margin:0 auto;}
+    .card{ background:#fff; border-radius:12px; padding:20px; box-shadow: 0 10px 30px rgba(11,43,74,0.06); }
+    .row{ display:flex; gap:16px; margin-top:18px; flex-wrap:wrap;}
+    .tile{ flex:1 1 220px; padding:16px; border-radius:10px; background:#f8fbff; min-width:220px; }
+    button{ padding:10px 14px; border-radius:10px; border:none; cursor:pointer; background:var(--navy); color:#fff; font-weight:600;}
+    footer{ color:var(--muted); text-align:center; margin-top:22px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Gouvernement de Lorval</div>
+    <div>
+      <button id="logoutBtn">Déconnexion</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2 id="greet">Salut, citoyen</h2>
+      <p style="color:var(--muted)">Bienvenue au tableau de bord. Utilise les tuiles pour naviguer.</p>
+
+      <div class="row">
+        <div class="tile"><strong>Mes services</strong><p style="color:var(--muted)">Demandes, formulaires, informations.</p></div>
+        <div class="tile"><strong>Documents officiels</strong><p style="color:var(--muted)">Permis, certificats.</p></div>
+        <div class="tile"><strong>Soutien</strong><p style="color:var(--muted)">Contact & assistance.</p></div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <details>
+          <summary style="cursor:pointer; font-weight:600">Données de session</summary>
+          <pre id="sessionDump"></pre>
+        </details>
+      </div>
+    </div>
+
+    <footer>© Gouvernement de Lorval — Interface de démonstration</footer>
+  </main>
+
+  <script>
+    // greet from localStorage
+    const user = JSON.parse(localStorage.getItem('lorval_user') || 'null')
+    if(user && user.email){
+      document.getElementById('greet').textContent = `Salut, ${user.email}`
+      document.getElementById('sessionDump').textContent = JSON.stringify(user, null, 2)
+    } else {
+      document.getElementById('greet').textContent = `Salut, visiteur`
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      localStorage.removeItem('lorval_user')
+      // clear supabase auth if you added it
+      // redirect to home
+      window.location.href = 'index.html'
+    })
+  </script>
+</body>
+</html>
