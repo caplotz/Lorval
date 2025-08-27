@@ -1,411 +1,647 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gouvernement de Lorval — Accueil</title>
-
-  <!-- Supabase JS (cdn) -->
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lorval — Portail gouvernemental</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --navy:#0b2b4a;
-      --accent:#0b2b4a;
-      --muted:#7a8997;
-      font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
+      --bg: #ffffff;
+      --text: #0a2a66; /* bleu marine */
+      --accent: #1e56ff;
+      --muted: #5b79a6;
+      --shadow: 0 10px 30px rgba(0,0,0,.10);
+      --shadow-soft: 0 8px 20px rgba(10,42,102,.12);
+      --radius: 18px;
+      --speed: 260ms;
     }
-
-    html,body{
-      height:100%;
-      margin:0;
-      background: #ffffff;
-      color:var(--navy);
-      -webkit-font-smoothing:antialiased;
+    *{ box-sizing:border-box }
+    html, body{ height:100%; }
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      display:flex; align-items:center; justify-content:center;
     }
-
-    .center {
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-    }
-
-    .card {
-      width:100%;
-      max-width:920px;
-      background: #fff;
-      border-radius:14px;
-      padding:32px;
-      box-shadow: 0 10px 30px rgba(11,43,74,0.08);
+    .wrap{
+      width:min(880px, 92vw);
       text-align:center;
     }
+    .card{
+      background:#fff; border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:36px 28px; transition: box-shadow var(--speed) ease, transform var(--speed) ease;
+    }
+    .card:hover{ box-shadow:var(--shadow-soft); transform: translateY(-2px); }
 
-    h1 {
-      margin:0;
-      font-weight:700;
-      letter-spacing: -0.02em;
-      font-size:36px;
-      color:var(--navy);
-    }
+    h1{ font-size: clamp(28px, 4vw, 42px); margin: 0 0 8px; letter-spacing:.2px; }
+    p.lead{ margin: 0 0 16px; color: var(--muted); font-size: clamp(14px, 2.2vw, 18px); }
 
-    p.lead {
-      color:var(--muted);
-      margin:12px 0 28px 0;
-    }
+    .stack{ display:flex; flex-direction:column; gap:14px; align-items:center; justify-content:center; }
+    .row{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center; }
 
-    .btn {
-      display:inline-block;
-      border-radius:10px;
-      padding:12px 18px;
-      background:var(--navy);
-      color:#fff;
-      text-decoration:none;
-      font-weight:600;
-      margin:8px;
-      box-shadow: 0 6px 18px rgba(11,43,74,0.12);
-      transition: transform .22s cubic-bezier(.2,.9,.3,1), opacity .22s;
-      cursor:pointer;
-      border:none;
+    button, .btn{
+      appearance:none; border:none; outline:none; cursor:pointer;
+      background:#fff; color:var(--text); box-shadow:var(--shadow);
+      border-radius: 14px; padding:12px 18px; font-weight:600;
+      transition: transform var(--speed) ease, box-shadow var(--speed) ease, background var(--speed) ease, color var(--speed) ease;
     }
-    .btn.ghost{
-      background:transparent;
-      color:var(--navy);
-      border:1px solid rgba(11,43,74,0.08);
-    }
-    .btn:active{ transform: translateY(2px); }
+    button:hover, .btn:hover{ transform: translateY(-1px); box-shadow:var(--shadow-soft); }
+    button.primary{ background: var(--accent); color: #fff; }
+    button.linklike{ background:transparent; box-shadow:none; color:var(--accent); text-decoration:underline; }
 
-    /* containers that appear/disappear */
-    .panel {
-      opacity:0;
-      transform: translateY(8px);
-      transition: opacity .6s ease, transform .6s ease;
-      pointer-events:none;
-    }
-    .panel.show {
-      opacity:1;
-      transform: translateY(0px);
-      pointer-events:auto;
-    }
+    .hint{ font-size: 13px; color: var(--muted); }
+    .footnote{ font-size: 12px; color: var(--muted); margin-top: 12px; }
 
-    /* Welcome text animation */
-    .welcome {
-      font-size:28px;
-      font-weight:700;
-      color:var(--navy);
-      opacity:1;
-      transition: opacity 1s ease;
-    }
-    .welcome.fade-out {
-      opacity:0;
-    }
+    /* Forms */
+    form{ width: min(520px, 92%); text-align:left; margin-inline:auto; }
+    label{ font-size:14px; font-weight:600; display:block; margin: 8px 2px; }
+    input{ width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid #d9e1f2; outline:none; color: var(--text); background:#fff; box-shadow: var(--shadow);
+      transition: border var(--speed) ease, box-shadow var(--speed) ease; }
+    input:focus{ border-color: var(--accent); box-shadow: 0 0 0 4px rgba(30,86,255,.10), var(--shadow); }
+    .form-row{ display:flex; gap:12px; }
+    .form-row > div{ flex:1; }
 
-    /* small link */
-    .small {
-      margin-top:18px;
-      color:var(--accent);
-      font-size:14px;
-    }
+    .divider{ height:1px; background: #e7eefc; margin: 18px 0; }
 
-    /* form styling */
-    .form {
-      max-width:520px;
-      margin:0 auto;
-      text-align:left;
-    }
-    .field {
-      display:flex;
-      flex-direction:column;
-      margin-bottom:12px;
-    }
-    label { font-size:13px; margin-bottom:6px; color:var(--navy); }
-    input[type="text"], input[type="email"], input[type="password"] {
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid rgba(11,43,74,0.08);
-      font-size:14px;
-      outline:none;
-      box-shadow: 0 6px 18px rgba(11,43,74,0.03) inset;
-    }
+    /* Sections visibility + animations */
+    .hidden{ display:none !important; }
+    .fade-in{ animation: fadeIn var(--speed) ease forwards; }
+    .fade-out{ animation: fadeOut var(--speed) ease forwards; }
+    @keyframes fadeIn{ from{ opacity:0; transform: translateY(6px) scale(.98);} to{ opacity:1; transform:none;} }
+    @keyframes fadeOut{ from{ opacity:1; } to{ opacity:0; transform: translateY(6px) scale(.98);} }
 
-    .msg {
-      margin-top:8px;
-      font-size:13px;
-      color:#b23;
-    }
+    /* Hero welcome text animation */
+    .welcome{ font-weight:700; letter-spacing: .3px; opacity:0; animation: popIn 900ms cubic-bezier(.2,.8,.2,1) forwards; }
+    @keyframes popIn{ 0%{ opacity:0; transform: translateY(8px) scale(.98);} 60%{ opacity:1; transform:none;} 100%{ opacity:1; } }
 
-    footer {
-      margin-top:18px;
-      font-size:13px;
-      color:var(--muted);
+    /* Dashboards */
+    .dashboard{
+      display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: 14px;
     }
+    .tile{ padding:18px; border-radius: 16px; box-shadow: var(--shadow); text-align:left; }
+    .tile h3{ margin:0 0 6px; font-size: 16px; }
+    .tile p{ margin:0; color: var(--muted); font-size: 14px; }
 
-    /* tiny responsive */
-    @media (max-width:560px){
-      h1 { font-size:26px; }
-      .card { padding:20px; }
-    }
+    footer{ margin-top: 18px; font-size: 12px; color: var(--muted); }
   </style>
 </head>
 <body>
-  <div class="center">
-    <div class="card" role="main">
-      <div id="welcomeBlock">
-        <div class="welcome" id="welcomeText">Bienvenue à Lorval!</div>
-        <p class="lead">Site officiel — Services & accès citoyens</p>
+  <div class="wrap">
+    <div class="card" id="card">
+      <h1 class="welcome" id="welcomeText">Bienvenue à Lorval !</h1>
+      <p class="lead" id="leadTxt">Portail officiel — services civils, entreprises, forces de l'ordre et autorités.</p>
+
+      <!-- Main stage container: we swap content inside this -->
+      <div id="stage" class="stack" style="margin-top:18px;">
+        <!-- Buttons appear after welcome fades out -->
       </div>
 
-      <!-- main identity choice -->
-      <div id="identityPanel" class="panel">
-        <button class="btn" id="btnResident">Je vis à Lorval</button>
-        <button class="btn ghost" id="btnVisitor">Je ne vis pas à Lorval</button>
-        <div class="small"><a id="peek" href="#" style="color:var(--navy);text-decoration:none;">Je veux juste regarder le site.</a></div>
-      </div>
-
-      <!-- resident roles -->
-      <div id="rolePanel" class="panel">
-        <div style="margin-bottom:16px;font-weight:600;">Tu es :</div>
-        <div>
-          <button class="btn" data-role="civil">Je suis un civil</button>
-          <button class="btn ghost" data-role="police">Je suis un agent de la paix (Police)</button>
-          <button class="btn ghost" data-role="business">Je suis une entreprise</button>
-          <button class="btn ghost" data-role="gov">Je suis une autorité gouvernementale</button>
-          <button class="btn ghost" data-role="admin">Je suis un administrateur du site</button>
-        </div>
-      </div>
-
-      <!-- civil auth panel -->
-      <div id="civilPanel" class="panel">
-        <div style="margin-bottom:14px;font-weight:600;">Civil — Choisis</div>
-        <div>
-          <button class="btn" id="btnLogin">Se connecter</button>
-          <button class="btn ghost" id="btnSignup">Se créer un compte</button>
-        </div>
-      </div>
-
-      <!-- login form -->
-      <div id="loginPanel" class="panel">
-        <form id="loginForm" class="form" onsubmit="return false;">
-          <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" required /></div>
-          <div class="field"><label for="loginPassword">Mot de passe</label><input id="loginPassword" type="password" required /></div>
-          <div style="text-align:center;">
-            <button class="btn" id="doLogin">Connexion</button>
-            <button class="btn ghost" id="backFromLogin">Retour</button>
-          </div>
-          <div id="loginMsg" class="msg" aria-live="polite"></div>
-        </form>
-      </div>
-
-      <!-- signup form -->
-      <div id="signupPanel" class="panel">
-        <form id="signupForm" class="form" onsubmit="return false;">
-          <div class="field"><label for="signupEmail">Email</label><input id="signupEmail" type="email" required /></div>
-          <div class="field"><label for="signupName">Nom complet</label><input id="signupName" type="text" required /></div>
-          <div class="field"><label for="signupPseudo">Pseudo</label><input id="signupPseudo" type="text" required /></div>
-          <div class="field"><label for="signupSSN">Code de sécurité sociale</label><input id="signupSSN" type="text" required placeholder="ex: 123-45-678" /></div>
-          <div class="field"><label for="signupPassword">Mot de passe</label><input id="signupPassword" type="password" required /></div>
-          <div style="text-align:center;">
-            <button class="btn" id="doSignup">Créer le compte</button>
-            <button class="btn ghost" id="backFromSignup">Retour</button>
-          </div>
-          <div id="signupMsg" class="msg" aria-live="polite"></div>
-        </form>
-      </div>
-
-      <footer id="footerNote">© Gouvernement de Lorval</footer>
+      <div id="smallNote" class="footnote"></div>
     </div>
+
+    <footer>
+      © <span id="year"></span> Parti Politique de Lorval — Tous droits réservés.
+    </footer>
   </div>
 
+  <!-- Supabase JS v2 via ESM -->
   <script type="module">
-    // ---------- Supabase setup ----------
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+    /* =========================================================
+       ⚠️ AVIS (tech): Cette page client utilise Supabase (auth)
+       - URL: fourni par l'utilisateur
+       - KEY: anon key (publique) fournie par l'utilisateur
+       - On présume l'existence d'une table `profiles` (RLS activé)
+         avec colonnes: id(uuid, PK = auth.users.id), email, pseudo,
+         ssn, full_name, role, created_at.
+       - Si cette table n'existe pas, les vérifications d'unicité
+         tenteront puis retomberont sur localStorage.
+       ========================================================= */
+
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/esm/supabase.min.js'
+
     const supabaseUrl = 'https://rmxgjsvpmnganddmnpdm.supabase.co'
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteGdqc3ZwbW5nYW5kZG1ucGRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NDMwNTgsImV4cCI6MjA3MTIxOTA1OH0.8q1RGvHvu3pu6BZo1DT3texcMvXMLNCm6gpwsR8lpDQ'
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // ---------- Local "valid SSN" DB included in HTML ----------
-    // Remplace ces valeurs par celles légit (exemple)
-    const validSSNs = [
-      '123-45-678', '111-22-333', '999-88-777', '555-66-444'
+    /* ---------------------- Faux registres (HTML-embedded) ---------------------- */
+    // Ces listes servent à valider des codes côté client (démo). Remplace/alimente via la BD côté serveur en prod.
+    const SSN_WHITELIST = [
+      'LOR-1980-0001', 'LOR-1992-4455', 'LOR-2000-7777', 'LOR-2010-8888'
+    ]
+    const COMPANY_CODES = [ 'ENT-1000', 'ENT-1001', 'ENT-2042', 'ENT-7777' ]
+    const GOV_CODES = [ 'GOV-LOR-001', 'GOV-LOR-002', 'GOV-TRESOR-07' ]
+    const POLICE_REGISTRY = [
+      { matricule: 'P1234', password: 'alpha42' },
+      { matricule: 'P9876', password: 'bravo77' },
+      { matricule: 'PX555', password: 'charlie' }
     ]
 
-    // ---------- Helpers ----------
-    const $ = id => document.getElementById(id)
-    const panels = {
-      identity: $('identityPanel'),
-      role: $('rolePanel'),
-      civil: $('civilPanel'),
-      login: $('loginPanel'),
-      signup: $('signupPanel')
+    /* ---------------------- Helpers UI ---------------------- */
+    const $ = (sel) => document.querySelector(sel)
+    const stage = $('#stage')
+    const welcomeText = $('#welcomeText')
+    const leadTxt = $('#leadTxt')
+    const smallNote = $('#smallNote')
+
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+
+    function clearStage(){ stage.innerHTML = '' }
+    function btn(label, classes='', attrs=''){
+      const el = document.createElement('button')
+      el.className = classes
+      el.innerText = label
+      if(attrs) Object.entries(attrs).forEach(([k,v])=> el.setAttribute(k,v))
+      return el
     }
 
-    function showPanel(panelEl) {
-      // hide all panels then show target
-      Object.values(panels).forEach(p => p.classList.remove('show'))
-      panelEl.classList.add('show')
-      window.scrollTo({top:0,behavior:'smooth'})
+    function note(html){ smallNote.innerHTML = html || '' }
+
+    function transition(next){
+      stage.classList.remove('fade-in'); stage.classList.add('fade-out')
+      setTimeout(()=>{ clearStage(); next(); stage.classList.remove('fade-out'); stage.classList.add('fade-in') }, 230)
     }
 
-    // Welcome animation sequence
-    const welcomeText = $('welcomeText')
-    const identityPanel = $('identityPanel')
-    setTimeout(()=> {
-      // fade-out welcome then show identity
-      welcomeText.classList.add('fade-out')
-      setTimeout(()=> {
-        $('welcomeBlock').style.display='none'
-        showPanel(identityPanel)
-      }, 900)
-    }, 1100)
+    function info(text){
+      const p = document.createElement('p')
+      p.className = 'hint'
+      p.textContent = text
+      return p
+    }
 
-    // Event listeners
-    $('btnResident').addEventListener('click', ()=> {
-      // fade
-      identityPanel.classList.remove('show')
-      setTimeout(()=> showPanel(panels.role), 250)
-    })
+    function showError(msg){
+      const p = document.createElement('p')
+      p.style.color = '#b00020'
+      p.style.fontWeight = '600'
+      p.textContent = msg
+      return p
+    }
 
-    // "just look" link
-    $('peek').addEventListener('click', (e)=>{
-      e.preventDefault()
-      alert("Visionneuse publique activée. Navigation limitée. (Simulation)")
-    })
+    /* ---------------------- Stages ---------------------- */
+    async function showLanding(){
+      clearStage(); note('')
+      const row = document.createElement('div'); row.className = 'row'
+      const b1 = btn('Je vis à Lorval', 'primary')
+      const b2 = btn("Je ne vis pas à Lorval")
+      row.appendChild(b1); row.appendChild(b2)
+      stage.appendChild(row)
 
-    // role buttons
-    document.querySelectorAll('[data-role]').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        const role = btn.dataset.role
-        if(role === 'civil') {
-          panels.role.classList.remove('show')
-          setTimeout(()=> showPanel(panels.civil), 240)
-        } else {
-          alert("Section pour '" + btn.textContent + "' — pas implémentée dans cette démo.")
-        }
-      })
-    })
+      b1.onclick = () => transition(showResidentChoices)
+      b2.onclick = () => {
+        transition(()=>{
+          stage.appendChild(info("Mode lecture seulement. Parcours public en préparation."))
+          const back = btn('Revenir', '')
+          back.onclick = () => transition(showLanding)
+          stage.appendChild(back)
+        })
+      }
+    }
 
-    // civil panel actions
-    $('btnLogin').addEventListener('click', ()=> {
-      panels.civil.classList.remove('show')
-      setTimeout(()=> showPanel(panels.login), 240)
-    })
-    $('btnSignup').addEventListener('click', ()=> {
-      panels.civil.classList.remove('show')
-      setTimeout(()=> showPanel(panels.signup), 240)
-    })
+    function showResidentChoices(){
+      clearStage(); note('<span class="hint">Je veux juste regarder le site.</span>')
+      const row = document.createElement('div'); row.className = 'row'
+      const roles = [
+        ['Je suis un civil', showCivilEntry],
+        ["Je suis un agent de la paix (Police)", showPoliceLogin],
+        ["Je suis une entreprise", showEnterpriseEntry],
+        ["Je suis une autorité gouvernementale", showGovLogin],
+        ["Je suis un administrateur du site", showAdminLogin]
+      ]
+      roles.forEach(([label, fn])=>{ const b = btn(label); b.onclick = ()=> transition(fn); row.appendChild(b) })
+      stage.appendChild(row)
+    }
 
-    // back buttons
-    $('backFromLogin').addEventListener('click', ()=> {
-      panels.login.classList.remove('show')
-      setTimeout(()=> showPanel(panels.civil), 240)
-    })
-    $('backFromSignup').addEventListener('click', ()=> {
-      panels.signup.classList.remove('show')
-      setTimeout(()=> showPanel(panels.civil), 240)
-    })
+    /* ---------------------- Civil: login / signup ---------------------- */
+    function showCivilEntry(){
+      clearStage(); note('')
+      const row = document.createElement('div'); row.className = 'row'
+      const login = btn('Se connecter', 'primary')
+      const signup = btn('Se créer un compte')
+      login.onclick = ()=> transition(showCivilLogin)
+      signup.onclick = ()=> transition(showCivilSignup)
+      row.append(login, signup)
+      stage.appendChild(row)
 
-    // ---------- Login logic ----------
-    $('doLogin').addEventListener('click', async (e) => {
-      e.preventDefault()
-      $('loginMsg').textContent = ''
-      const email = $('loginEmail').value.trim()
-      const password = $('loginPassword').value
-      if(!email || !password){ $('loginMsg').textContent = 'Remplis email & mot de passe.'; return; }
+      const back = btn('Retour', 'linklike')
+      back.onclick = ()=> transition(showResidentChoices)
+      stage.appendChild(back)
+    }
 
-      $('doLogin').disabled = true
-      $('doLogin').textContent = 'Connexion...'
-
-      try {
-        // utilise Supabase Auth
+    function showCivilLogin(){
+      clearStage(); note('')
+      const f = document.createElement('form')
+      f.innerHTML = `
+        <label>Email</label>
+        <input type="email" name="email" placeholder="votre@email.lor" required>
+        <label>Mot de passe</label>
+        <input type="password" name="password" placeholder="••••••" minlength="6" required>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="primary" type="submit">Connexion</button>
+          <button type="button" id="toSignup">Créer un compte</button>
+          <button type="button" id="back">Retour</button>
+        </div>
+      `
+      f.onsubmit = async (e)=>{
+        e.preventDefault()
+        const email = f.email.value.trim()
+        const password = f.password.value
+        clearStage(); stage.appendChild(info('Connexion en cours…'))
         const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-        if(error) {
-          console.error('Login error', error)
-          $('loginMsg').textContent = 'Email ou mot de passe invalide.'
-          $('doLogin').disabled = false
-          $('doLogin').textContent = 'Connexion'
-          return
-        }
-        // Login OK - redirige dashboard
-        localStorage.setItem('lorval_user', JSON.stringify({ email }))
-        window.location.href = 'dashboard.html'
-      } catch(err) {
-        console.error(err)
-        $('loginMsg').textContent = 'Erreur inattendue.'
-      } finally {
-        $('doLogin').disabled = false
-        $('doLogin').textContent = 'Connexion'
+        if(error){ transition(()=>{ stage.appendChild(showError('Échec de connexion. Vérifiez vos identifiants.')) ; stage.appendChild(btn('Réessayer', '', {id:'retry'})); $('#retry').onclick = ()=> transition(showCivilLogin) }) ; return }
+        transition(()=> showCivilDashboard(data.user))
       }
-    })
+      stage.appendChild(f)
+      $('#toSignup').onclick = ()=> transition(showCivilSignup)
+      $('#back').onclick = ()=> transition(showCivilEntry)
+    }
 
-    // ---------- Signup logic ----------
-    $('doSignup').addEventListener('click', async (e) => {
-      e.preventDefault()
-      $('signupMsg').textContent = ''
-      const email = $('signupEmail').value.trim()
-      const name = $('signupName').value.trim()
-      const pseudo = $('signupPseudo').value.trim()
-      const ssn = $('signupSSN').value.trim()
-      const password = $('signupPassword').value
+    async function showCivilSignup(){
+      clearStage(); note('')
+      const f = document.createElement('form')
+      f.innerHTML = `
+        <div class="form-row">
+          <div>
+            <label>Nom complet</label>
+            <input type="text" name="full" placeholder="Nom Prénom" required>
+          </div>
+          <div>
+            <label>Pseudo (unique)</label>
+            <input type="text" name="pseudo" placeholder="@patnaise" minlength="3" required>
+          </div>
+        </div>
+        <label>Code de sécurité sociale (valide)</label>
+        <input type="text" name="ssn" placeholder="LOR-1992-4455" required>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="votre@email.lor" required>
+        <label>Mot de passe (min 6)</label>
+        <input type="password" name="password" placeholder="••••••" minlength="6" required>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="primary" type="submit">Créer mon compte</button>
+          <button type="button" id="back">Retour</button>
+        </div>
+        <p class="hint">Les champs doivent être uniques (email, pseudo, code SSN). Validation côté BD Supabase si disponible.</p>
+      `
 
-      // basic checks
-      if(!email || !name || !pseudo || !ssn || !password) { $('signupMsg').textContent = 'Remplis tous les champs.'; return; }
-      if(!validSSNs.includes(ssn)) { $('signupMsg').textContent = 'Code de sécurité sociale invalide.'; return; }
-
-      $('doSignup').disabled = true
-      $('doSignup').textContent = 'Création...'
-
-      try {
-        // 1) Check uniqueness from table 'citizens'
-        // Note: assure-toi d'avoir une table 'citizens' dans Supabase avec colonnes email, pseudo, ssn
-        // On fait trois queries pour la clarté (tu peux combiner en un seul call).
-        const { data: byEmail } = await supabase.from('citizens').select('id').eq('email', email).limit(1)
-        if(byEmail && byEmail.length) { $('signupMsg').textContent = 'Email déjà utilisé.'; throw 'dup' }
-
-        const { data: byPseudo } = await supabase.from('citizens').select('id').eq('pseudo', pseudo).limit(1)
-        if(byPseudo && byPseudo.length) { $('signupMsg').textContent = 'Pseudo déjà utilisé.'; throw 'dup' }
-
-        const { data: bySSN } = await supabase.from('citizens').select('id').eq('ssn', ssn).limit(1)
-        if(bySSN && bySSN.length) { $('signupMsg').textContent = 'Code de sécurité sociale déjà utilisé.'; throw 'dup' }
-
-        // 2) Create auth user (supabase auth)
-        const { data: signData, error: signError } = await supabase.auth.signUp({ email, password })
-        if(signError) {
-          console.error('Auth signup err', signError)
-          $('signupMsg').textContent = 'Impossible de créer l’utilisateur (auth).'
-          throw signError
+      async function checkUniqueness(email, pseudo, ssn){
+        // 1) Validate SSN whitelist (client-side quick gate)
+        if(!SSN_WHITELIST.includes(ssn)){
+          throw new Error('Code de sécurité sociale invalide (non reconnu pour Lorval).')
         }
-        // Optionnel : insert profile into citizens table
-        const { data: insertData, error: insertError } = await supabase.from('citizens').insert([
-          { email, full_name: name, pseudo, ssn }
-        ])
-        if(insertError){
-          console.error('Insert profile err', insertError)
-          $('signupMsg').textContent = 'Erreur lors de l’ajout du profil.'
-          throw insertError
+        // 2) Try to check via Supabase `profiles`
+        try{
+          const { data: p1, error: e1 } = await supabase.from('profiles').select('email').eq('email', email).maybeSingle()
+          if(e1) throw e1
+          if(p1) throw new Error('Email déjà utilisé.')
+          const { data: p2, error: e2 } = await supabase.from('profiles').select('pseudo').eq('pseudo', pseudo).maybeSingle()
+          if(e2) throw e2
+          if(p2) throw new Error('Pseudo déjà utilisé.')
+          const { data: p3, error: e3 } = await supabase.from('profiles').select('ssn').eq('ssn', ssn).maybeSingle()
+          if(e3) throw e3
+          if(p3) throw new Error('Code SSN déjà utilisé.')
+          return true
+        }catch(err){
+          // Fallback localStorage (démo seulement)
+          const bag = JSON.parse(localStorage.getItem('lorval_profiles')||'[]')
+          if(bag.find(u=>u.email===email)) throw new Error('Email déjà utilisé (local).')
+          if(bag.find(u=>u.pseudo===pseudo)) throw new Error('Pseudo déjà utilisé (local).')
+          if(bag.find(u=>u.ssn===ssn)) throw new Error('Code SSN déjà utilisé (local).')
+          return true
         }
-
-        // succès
-        localStorage.setItem('lorval_user', JSON.stringify({ email }))
-        window.location.href = 'dashboard.html'
-      } catch(err){
-        if(err !== 'dup') console.error(err)
-      } finally {
-        $('doSignup').disabled = false
-        $('doSignup').textContent = 'Créer le compte'
       }
-    })
 
-    // Bonus: check if already logged in
-    (async ()=> {
-      const { data: { user } } = await supabase.auth.getUser().catch(()=>({ data:{ user:null } }))
-      if(user){
-        localStorage.setItem('lorval_user', JSON.stringify({ email: user.email }))
-        // redirect quietly
-        // window.location.href = 'dashboard.html' // commented to not annoy during dev
+      f.onsubmit = async (e)=>{
+        e.preventDefault()
+        const full = f.full.value.trim()
+        const pseudo = f.pseudo.value.trim()
+        const ssn = f.ssn.value.trim().toUpperCase()
+        const email = f.email.value.trim()
+        const password = f.password.value
+
+        clearStage(); stage.appendChild(info('Vérification des informations…'))
+        try{
+          await checkUniqueness(email, pseudo, ssn)
+        }catch(err){ transition(()=>{ stage.appendChild(showError(err.message)); stage.appendChild(btn('Corriger', '', {id:'fix'})); $('#fix').onclick=()=> transition(showCivilSignup) }); return }
+
+        stage.innerHTML = ''
+        stage.appendChild(info('Création du compte…'))
+        // 1) Create auth user
+        const { data: sign, error: signErr } = await supabase.auth.signUp({
+          email, password,
+          options: { data: { full_name: full, pseudo, ssn, role: 'civil' } }
+        })
+        if(signErr){ transition(()=>{ stage.appendChild(showError('Création échouée: '+signErr.message)); stage.appendChild(btn('Réessayer', '', {id:'ret'})); $('#ret').onclick=()=> transition(showCivilSignup) }); return }
+
+        // 2) Insert profile row (best effort)
+        try{
+          if(sign.user){
+            await supabase.from('profiles').insert({ id: sign.user.id, email, pseudo, ssn, full_name: full, role: 'civil' })
+          }
+        }catch(_){ /* ignore table/RLS errors in demo */ }
+
+        // 3) Fallback record in localStorage to keep uniqueness locally
+        const bag = JSON.parse(localStorage.getItem('lorval_profiles')||'[]')
+        bag.push({ email, pseudo, ssn, full_name: full, role: 'civil' })
+        localStorage.setItem('lorval_profiles', JSON.stringify(bag))
+
+        // 4) If session exists go dashboard directly, else try sign-in (depends on project email confirmation setting)
+        if(sign.session && sign.user){ transition(()=> showCivilDashboard(sign.user)) }
+        else {
+          const { data: s2, error: e2 } = await supabase.auth.signInWithPassword({ email, password })
+          if(e2){ transition(()=>{ stage.appendChild(info('Compte créé. Veuillez confirmer votre courriel si requis, puis connectez-vous.')) ; stage.appendChild(btn('Aller à la connexion', 'primary', {id:'go'}) ); $('#go').onclick=()=> transition(showCivilLogin) }) ; return }
+          transition(()=> showCivilDashboard(s2.user))
+        }
       }
-    })()
 
+      stage.appendChild(f)
+      const back = btn('Retour', 'linklike')
+      back.onclick = ()=> transition(showCivilEntry)
+      stage.appendChild(back)
+    }
+
+    function showCivilDashboard(user){
+      clearStage(); note('')
+      const name = (user?.user_metadata?.full_name) || user?.email || 'Citoyen'
+      const h = document.createElement('h2'); h.textContent = `Bonjour, ${name}`
+      const p = document.createElement('p'); p.className = 'lead'; p.textContent = 'Tableau de bord — services civils'
+      stage.append(h,p)
+
+      const grid = document.createElement('div'); grid.className = 'dashboard'
+      grid.innerHTML = `
+        <div class="tile"><h3>Documents</h3><p>Demander un acte, attestation, etc.</p></div>
+        <div class="tile"><h3>Taxes</h3><p>Déclarer et payer vos impôts.</p></div>
+        <div class="tile"><h3>Santé</h3><p>Rendez-vous et dossiers.</p></div>
+        <div class="tile"><h3>Éducation</h3><p>Inscriptions et relevés.</p></div>
+      `
+      stage.appendChild(grid)
+
+      const row = document.createElement('div'); row.className='row'
+      const logout = btn('Se déconnecter')
+      logout.onclick = async ()=>{ await supabase.auth.signOut(); transition(showLanding) }
+      row.appendChild(logout)
+      stage.appendChild(row)
+    }
+
+    /* ---------------------- Police ---------------------- */
+    function showPoliceLogin(){
+      clearStage(); note('')
+      const f = document.createElement('form')
+      f.innerHTML = `
+        <label>Matricule (4 à 6 caractères)</label>
+        <input type="text" name="mat" minlength="4" maxlength="6" placeholder="P1234" required>
+        <label>Mot de passe</label>
+        <input type="password" name="pwd" placeholder="••••••" required>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="primary" type="submit">Connexion</button>
+          <button type="button" id="back">Retour</button>
+        </div>
+        <p class="hint">Les comptes policiers sont créés par l'administration (pas d'auto-inscription).</p>
+      `
+      f.onsubmit = (e)=>{
+        e.preventDefault()
+        const m = f.mat.value.trim()
+        const p = f.pwd.value
+        const ok = POLICE_REGISTRY.find(r=>r.matricule===m && r.password===p)
+        if(!ok){ transition(()=>{ stage.appendChild(showError('Identifiants policiers invalides.')); stage.appendChild(btn('Réessayer', '', {id:'try'})); $('#try').onclick=()=> transition(showPoliceLogin) }); return }
+        transition(()=> showPoliceDashboard(m))
+      }
+      stage.appendChild(f)
+      $('#back').onclick = ()=> transition(showResidentChoices)
+    }
+
+    function showPoliceDashboard(matricule){
+      clearStage(); note('')
+      const h = document.createElement('h2'); h.textContent = `Police — Matricule ${matricule}`
+      const p = document.createElement('p'); p.className = 'lead'; p.textContent = 'Tableau de bord opérationnel'
+      stage.append(h,p)
+      const grid = document.createElement('div'); grid.className = 'dashboard'
+      grid.innerHTML = `
+        <div class="tile"><h3>Signalements</h3><p>Consulter et traiter.</p></div>
+        <div class="tile"><h3>Patrouilles</h3><p>Planning et équipes.</p></div>
+        <div class="tile"><h3>Base véhicules</h3><p>Immatriculations & contrôles.</p></div>
+      `
+      stage.appendChild(grid)
+      const b = btn('Quitter'); b.onclick = ()=> transition(showResidentChoices)
+      stage.appendChild(b)
+    }
+
+    /* ---------------------- Entreprise ---------------------- */
+    function showEnterpriseEntry(){
+      clearStage(); note('')
+      const row = document.createElement('div'); row.className = 'row'
+      const login = btn('Se connecter', 'primary')
+      const signup = btn('Créer un compte')
+      login.onclick = ()=> transition(showEnterpriseLogin)
+      signup.onclick = ()=> transition(showEnterpriseSignup)
+      row.append(login, signup)
+      stage.appendChild(row)
+      const back = btn('Retour', 'linklike')
+      back.onclick = ()=> transition(showResidentChoices)
+      stage.appendChild(back)
+    }
+
+    function showEnterpriseSignup(){
+      clearStage(); note('')
+      const f = document.createElement('form')
+      f.innerHTML = `
+        <label>Email d'entreprise</label>
+        <input type="email" name="email" placeholder="contact@entreprise.lor" required>
+        <label>Code d'entreprise (valide)</label>
+        <input type="text" name="code" placeholder="ENT-2042" required>
+        <label>Nom complet du PDG</label>
+        <input type="text" name="pdg" placeholder="Nom Prénom" required>
+        <label>Mot de passe</label>
+        <input type="password" name="pwd" minlength="6" placeholder="••••••" required>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="primary" type="submit">Créer l'accès</button>
+          <button type="button" id="back">Retour</button>
+        </div>
+      `
+      f.onsubmit = (e)=>{
+        e.preventDefault()
+        const code = f.code.value.trim().toUpperCase()
+        if(!COMPANY_CODES.includes(code)){
+          transition(()=>{ stage.appendChild(showError("Code d'entreprise invalide.")); stage.appendChild(btn('Corriger', '', {id:'fix'})); $('#fix').onclick=()=> transition(showEnterpriseSignup) }); return
+        }
+        const bag = JSON.parse(localStorage.getItem('lorval_enterprises')||'[]')
+        if(bag.find(x=>x.code===code)){
+          transition(()=>{ stage.appendChild(showError('Ce code est déjà enregistré.')); stage.appendChild(btn('Retour', '', {id:'ret'})); $('#ret').onclick=()=> transition(showEnterpriseEntry) }); return
+        }
+        bag.push({ code, email: f.email.value.trim(), pdg: f.pdg.value.trim(), pwd: f.pwd.value })
+        localStorage.setItem('lorval_enterprises', JSON.stringify(bag))
+        transition(()=> showEnterpriseDashboard(code))
+      }
+      stage.appendChild(f)
+      $('#back').onclick = ()=> transition(showEnterpriseEntry)
+    }
+
+    function showEnterpriseLogin(){
+      clearStage(); note('')
+      const f = document.createElement('form')
+      f.innerHTML = `
+        <label>Code d'entreprise</label>
+        <input type="text" name="code" placeholder="ENT-2042" required>
+        <label>Mot de passe</label>
+        <input type="password" name="pwd" placeholder="••••••" required>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="primary" type="submit">Connexion</button>
+          <button type="button" id="back">Retour</button>
+        </div>
+      `
+      f.onsubmit = (e)=>{
+        e.preventDefault()
+        const code = f.code.value.trim().toUpperCase()
+        const bag = JSON.parse(localStorage.getItem('lorval_enterprises')||'[]')
+        const ok = bag.find(x=>x.code===code && x.pwd===f.pwd.value)
+        if(!ok){ transition(()=>{ stage.appendChild(showError('Identifiants entreprise invalides.')); stage.appendChild(btn('Réessayer', '', {id:'try'})); $('#try').onclick=()=> transition(showEnterpriseLogin) }); return }
+        transition(()=> showEnterpriseDashboard(code))
+      }
+      stage.appendChild(f)
+      $('#back').onclick = ()=> transition(showEnterpriseEntry)
+    }
+
+    function showEnterpriseDashboard(code){
+      clearStage(); note('')
+      const h = document.createElement('h2'); h.textContent = `Espace Entreprise — ${code}`
+      const p = document.createElement('p'); p.className = 'lead'; p.textContent = 'Tableau de bord entreprise'
+      stage.append(h,p)
+      const grid = document.createElement('div'); grid.className = 'dashboard'
+      grid.innerHTML = `
+        <div class="tile"><h3>Facturation</h3><p>Voir paiements & aides.</p></div>
+        <div class="tile"><h3>Employés</h3><p>Déclarations sociales.</p></div>
+        <div class="tile"><h3>Appels d'offres</h3><p>Proposer & suivre.</p></div>
+      `
+      stage.appendChild(grid)
+      const b = btn('Quitter'); b.onclick = ()=> transition(showResidentChoices)
+      stage.appendChild(b)
+    }
+
+    /* ---------------------- Gouvernement ---------------------- */
+    function showGovLogin(){
+      clearStage(); note('')
+      const f = document.createElement('form')
+      f.innerHTML = `
+        <label>Code Gouvernemental</label>
+        <input type="text" name="code" placeholder="GOV-LOR-001" required>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="prenom.nom@gouv.lor" required>
+        <div class="form-row">
+          <div>
+            <label>Mot de passe 1</label>
+            <input type="password" name="p1" required>
+          </div>
+          <div>
+            <label>Mot de passe 2</label>
+            <input type="password" name="p2" required>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="primary" type="submit">Connexion</button>
+          <button type="button" id="back">Retour</button>
+        </div>
+      `
+      f.onsubmit = (e)=>{
+        e.preventDefault()
+        const code = f.code.value.trim().toUpperCase()
+        if(!GOV_CODES.includes(code) || f.p1.value.length<6 || f.p2.value.length<6){
+          transition(()=>{ stage.appendChild(showError('Informations gouvernementales invalides.')); stage.appendChild(btn('Réessayer', '', {id:'try'})); $('#try').onclick=()=> transition(showGovLogin) }); return
+        }
+        transition(()=> showGovDashboard(code))
+      }
+      stage.appendChild(f)
+      $('#back').onclick = ()=> transition(showResidentChoices)
+    }
+
+    function showGovDashboard(code){
+      clearStage(); note('')
+      const h = document.createElement('h2'); h.textContent = `Espace Gouvernemental — ${code}`
+      const p = document.createElement('p'); p.className = 'lead'; p.textContent = 'Tableau de bord ministériel'
+      stage.append(h,p)
+      const grid = document.createElement('div'); grid.className = 'dashboard'
+      grid.innerHTML = `
+        <div class="tile"><h3>Budget</h3><p>Crédits & engagements.</p></div>
+        <div class="tile"><h3>Population</h3><p>Statistiques & tendances.</p></div>
+        <div class="tile"><h3>Transparence</h3><p>Données ouvertes.</p></div>
+      `
+      stage.appendChild(grid)
+      const b = btn('Quitter'); b.onclick = ()=> transition(showResidentChoices)
+      stage.appendChild(b)
+    }
+
+    /* ---------------------- Administrateur ---------------------- */
+    function showAdminLogin(){
+      clearStage(); note('')
+      const f = document.createElement('form')
+      f.innerHTML = `
+        <label>Email administrateur</label>
+        <input type="email" name="email" placeholder="admin@lorval.gov" required>
+        <div class="form-row">
+          <div>
+            <label>Mot de passe 1</label>
+            <input type="password" name="p1" minlength="6" required>
+          </div>
+          <div>
+            <label>Mot de passe 2</label>
+            <input type="password" name="p2" minlength="6" required>
+          </div>
+        </div>
+        <label>Mot de passe 3</label>
+        <input type="password" name="p3" minlength="6" required>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="primary" type="submit">Connexion</button>
+          <button type="button" id="back">Retour</button>
+        </div>
+      `
+      f.onsubmit = (e)=>{
+        e.preventDefault()
+        const ok = f.p1.value.length>=6 && f.p2.value.length>=6 && f.p3.value.length>=6
+        if(!ok){ transition(()=>{ stage.appendChild(showError('Triple mot de passe requis.')); stage.appendChild(btn('Réessayer', '', {id:'try'})); $('#try').onclick=()=> transition(showAdminLogin) }); return }
+        transition(()=> showAdminDashboard(f.email.value.trim()))
+      }
+      stage.appendChild(f)
+      $('#back').onclick = ()=> transition(showResidentChoices)
+    }
+
+    function showAdminDashboard(email){
+      clearStage(); note('')
+      const h = document.createElement('h2'); h.textContent = `Administration — ${email}`
+      const p = document.createElement('p'); p.className = 'lead'; p.textContent = "Gestion du portail et des accès"
+      stage.append(h,p)
+      const grid = document.createElement('div'); grid.className = 'dashboard'
+      grid.innerHTML = `
+        <div class="tile"><h3>Utilisateurs</h3><p>Créer/valider comptes Police & Gouvernement.</p></div>
+        <div class="tile"><h3>Sécurité</h3><p>Politiques d'accès & audits.</p></div>
+        <div class="tile"><h3>Contenu</h3><p>Pages publiques & annonces.</p></div>
+      `
+      stage.appendChild(grid)
+      const b = btn('Quitter'); b.onclick = ()=> transition(showResidentChoices)
+      stage.appendChild(b)
+    }
+
+    /* ---------------------- Boot sequence ---------------------- */
+    async function boot(){
+      document.getElementById('year').textContent = new Date().getFullYear()
+      // Show welcome then fade it out, then show landing choices
+      await sleep(900)
+      // Fade-out hero
+      welcomeText.classList.add('fade-out')
+      leadTxt.classList.add('fade-out')
+      await sleep(400)
+      welcomeText.classList.add('hidden')
+      leadTxt.classList.add('hidden')
+      showLanding()
+      stage.classList.add('fade-in')
+    }
+
+    boot()
   </script>
 </body>
 </html>
